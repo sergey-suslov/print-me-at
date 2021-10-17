@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis
+    restart: always
+  service:
+    image: "${IMAGE_NAME}"
+    environment:
+      - REDIS_HOST=redis
+    deploy:
+      mode: replicated
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    ports:
+      - 8080:8080
+
+
