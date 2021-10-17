@@ -33,6 +33,12 @@ import { v4 as uuid } from 'uuid'
           .valid('development', 'production', 'test')
           .default('development'),
         HTTP_PORT: Joi.number().default(8080),
+
+        /**
+         * Redis
+         * */
+        REDIS_PORT: Joi.number().default(6379),
+        REDIS_HOST: Joi.number().default('localhost'),
       }),
     }),
   ],
