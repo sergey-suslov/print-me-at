@@ -1,12 +1,23 @@
-import { Inject, Injectable } from '@nestjs/common'
-import { Redis } from 'ioredis'
+import { InjectQueue } from '@nestjs/bull'
+import { Injectable } from '@nestjs/common'
+import { Queue } from 'bull'
+import { SCHEDULED_MESSAGES } from '../common/constants'
 import { MessageScheduler } from './interface/message-scheduler.interface'
 
 @Injectable()
 export class MessageSchedulerService implements MessageScheduler {
-  constructor(@Inject('REDIS') private readonly redis: Redis) {}
+  constructor(
+    @InjectQueue(SCHEDULED_MESSAGES)
+    private readonly scheduledMessagesQueue: Queue,
+  ) {}
 
   async scheduleMessage(message: string, time: Date): Promise<void> {
-    await this.redis.zadd('scheduledMessages', [time.getTime(), message])
+    await this.scheduledMessagesQueue.add(
+      {
+        message,
+        time: time.getTime(),
+      },
+      { delay: Math.max(0, time.getTime() - Date.now()) },
+    )
   }
 }
