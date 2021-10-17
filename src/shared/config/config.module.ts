@@ -38,7 +38,7 @@ import { v4 as uuid } from 'uuid'
          * Redis
          * */
         REDIS_PORT: Joi.number().default(6379),
-        REDIS_HOST: Joi.number().default('localhost'),
+        REDIS_HOST: Joi.string().default('localhost'),
       }),
     }),
   ],
