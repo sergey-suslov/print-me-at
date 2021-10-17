@@ -2,7 +2,7 @@ import { BullModule } from '@nestjs/bull'
 import { Module } from '@nestjs/common'
 import { SCHEDULED_MESSAGES } from '../common/constants'
 import { MessageSchedulerService } from './message-scheduler.service'
-import { MessageSchedulerProcessor } from './messsage-scheduler.processor'
+import { MessageSchedulerProcessor } from './message-scheduler.processor'
 
 @Module({
   imports: [

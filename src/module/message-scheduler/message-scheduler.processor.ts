@@ -1,7 +1,7 @@
 import { Processor, Process } from '@nestjs/bull'
 import { random } from 'lodash'
 import { Job } from 'bull'
-import { CustomLoggerService } from 'src/shared/helper/custom-logger.service'
+import { CustomLoggerService } from '../../shared/helper/custom-logger.service'
 import { SCHEDULED_MESSAGES } from '../common/constants'
 import { PrintMessagePayload } from '../printer/interface/printer.interface'
 
