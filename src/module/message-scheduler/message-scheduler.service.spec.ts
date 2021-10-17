@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { Redis } from 'ioredis'
+import { Queue } from 'bull'
 import { mocked } from 'ts-jest/utils'
 import { MessageSchedulerModule } from './message-scheduler.module'
 import { MessageSchedulerService } from './message-scheduler.service'
 
 class GenericStub {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  public zadd() {}
+  public add() {}
 }
 
 interface StubbedThings {
-  redis: Redis
+  scheduledMessagesQueue: Queue
 }
 
 describe('MessageSchedulerService', () => {
@@ -19,13 +19,15 @@ describe('MessageSchedulerService', () => {
   const stubs: StubbedThings = {} as StubbedThings
 
   const providers = [
-    { provide: 'REDIS', useClass: GenericStub },
+    { provide: 'BullQueue_scheduledMessages', useClass: GenericStub },
     { provide: MessageSchedulerService, useClass: MessageSchedulerService },
   ]
 
   beforeAll(async () => {
     module = await Test.createTestingModule({ providers }).compile()
-    stubs.redis = module.get<Redis>('REDIS')
+    stubs.scheduledMessagesQueue = module.get<Queue>(
+      'BullQueue_scheduledMessages',
+    )
   })
 
   beforeEach(async () => {
@@ -43,24 +45,31 @@ describe('MessageSchedulerService', () => {
         request: {
           message: 'message',
           time: new Date(),
-          setName: 'scheduledMessages',
         },
+        calledWith: {
+          message: 'message',
+          time: new Date().getTime(),
+        },
+
+        setName: 'scheduledMessages',
       }
 
-      jest.spyOn(stubs.redis, 'zadd').mockResolvedValue(Promise.resolve(1))
+      jest
+        .spyOn(stubs.scheduledMessagesQueue, 'add')
+        .mockResolvedValue(undefined)
 
       //ACT
       await sut.scheduleMessage(td.request.message, td.request.time)
 
       //ASSERT
-      expect(mocked(stubs.redis.zadd).mock.calls[0][0]).toEqual(
-        td.request.setName,
+      expect(mocked(stubs.scheduledMessagesQueue.add).mock.calls[0][0]).toEqual(
+        td.calledWith,
       )
-      expect(mocked(stubs.redis.zadd).mock.calls[0][1][0]).toEqual(
-        td.request.time.getTime(),
-      )
-      expect(mocked(stubs.redis.zadd).mock.calls[0][1][1]).toEqual(
-        td.request.message,
+      expect(
+        mocked(stubs.scheduledMessagesQueue.add).mock.calls[0][1],
+      ).toHaveProperty(
+        'delay',
+        Math.max(0, td.request.time.getTime() - Date.now()),
       )
     })
   })
