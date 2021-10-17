@@ -2,8 +2,9 @@ import {
   Body,
   Controller,
   HttpCode,
+  HttpException,
+  HttpStatus,
   Inject,
-  NotImplementedException,
   Post,
 } from '@nestjs/common'
 import { PrinterMessagePayloadDto } from './dto/printer.dto'
@@ -18,7 +19,10 @@ export class PrinterController {
 
   @Post('/printMeAt')
   @HttpCode(200)
-  async printMeAt(@Body() options: PrinterMessagePayloadDto): Promise<void> {
-    throw new NotImplementedException()
+  async printMeAt(@Body() payload: PrinterMessagePayloadDto): Promise<void> {
+    const result = await this.printerService.printAt(payload)
+    if (result instanceof Error) {
+      throw new HttpException(result.message, HttpStatus.INTERNAL_SERVER_ERROR)
+    }
   }
 }

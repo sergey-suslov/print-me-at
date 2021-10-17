@@ -1,9 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsString, IsUrl } from 'class-validator'
+import { Type } from 'class-transformer'
+import { IsDate, IsNotEmpty, IsString } from 'class-validator'
 
 export class PrinterMessagePayloadDto {
+  @IsDate()
+  @Type(() => Date)
+  @ApiProperty({
+    description: 'Date to print at',
+    required: true,
+  })
+  time!: Date
+
   @IsString()
-  @IsUrl()
+  @IsNotEmpty()
   @ApiProperty({
     description: 'Message to print',
     required: true,

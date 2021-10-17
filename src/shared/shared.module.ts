@@ -8,6 +8,6 @@ import { RedisModule } from './redis/redis.module'
 @Module({
   providers: [CustomLoggerService],
   imports: [ConfigModule, LoggerInitModule, RedisModule],
-  exports: [CustomLoggerService],
+  exports: [CustomLoggerService, RedisModule],
 })
 export class SharedModule {}
