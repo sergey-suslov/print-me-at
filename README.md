@@ -4,3 +4,6 @@ Since we want the server to be able to withstand restarts it will use Redis to p
 You should also assume that there might be more than one server running behind a load balancer (load balancing implementation itself does not need to be provided as part of the answer).
 In case the server was down when a message should have been printed, it should print it out when going back online.
 
+## Run locally
+Requires `redis` to be up and running on localhost:6379 by default  
+To run in docker, the swarm mode should be initiated. Then run `npm run start:swarm`
